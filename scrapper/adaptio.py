@@ -7,6 +7,21 @@ from collections import OrderedDict
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import json
+import re
+
+from elasticsearch import Elasticsearch
+
+es_client = Elasticsearch(["http://localhost:9200"])
+
+drop_company_index = es_client.indices.create(index="company-index", ignore=400)
+create_company_index = es_client.indices.delete(
+    index="company-index", ignore=[400, 404]
+)
+
+drop_company_profiles = es_client.indices.create(index="company-profiles", ignore=400)
+create_company_profiles = es_client.indices.delete(
+    index="company-profiles", ignore=[400, 404]
+)
 
 
 def get_page(url):
@@ -36,6 +51,13 @@ def parse_company_index(url):
             "source_url": source_url,
         }
 
+        # parse_company_profiles(source_url)
+
+        # ingest payload into elasticsearch
+        es_ci = es_client.index(
+            index="company-index", doc_type="docs", body=company_index_data
+        )
+
         print(company_index_data)
 
         company_index_list.append(company_index_data)
@@ -52,12 +74,6 @@ def parse_company_profiles(valid_source_url):
         company_name = company_name.getText()  # .replace('\n', '')
     else:
         company_name = ""
-
-    company_location = page.find("span", attrs={"itemprop": "address"})
-    if company_location is not None:
-        company_location = company_location.getText()  # .replace('\n', '')
-    else:
-        company_location = ""
 
     company_website = page.find(
         "div", attrs={"class": "CompanyTopInfo_websiteUrl__13kpn"}
@@ -77,34 +93,33 @@ def parse_company_profiles(valid_source_url):
     else:
         company_webdomain = ""
 
-    company_industry = (
-        page.find_all("div", attrs={"class": "CompanyTopInfo_infoItem__2Ufq5"})[2]
-        .find("div", attrs={"class": "CompanyTopInfo_contentWrapper__2Jkic"})
-        .find("span", attrs={"class": "CompanyTopInfo_infoValue__27_Yo"})
+    company_details = page.find_all(
+        "div", attrs={"class": "CompanyTopInfo_infoItem__2Ufq5"}
     )
-    if company_industry is not None:
-        company_industry = company_industry.getText()  # .replace('\n', '')
+
+    details_value_list = []
+
+    for company_detail in company_details:
+        details_value_list.append(
+            company_detail.find(
+                "span", attrs={"class": "CompanyTopInfo_infoValue__27_Yo"}
+            ).getText()
+        )
+    if not details_value_list == []:
+        if not len(details_value_list) == 4 and len(details_value_list) < 4:
+            last = 4 - len(details_value_list)
+            for i in range(0, last):
+                details_value_list.insert(0, "")
+
+        company_location = details_value_list[3]
+        company_industry = details_value_list[2]
+        company_employee_size = details_value_list[1]
+        company_revenue = details_value_list[0]
+
     else:
+        company_location = ""
         company_industry = ""
-
-    company_employee_size = (
-        page.find_all("div", attrs={"class": "CompanyTopInfo_infoItem__2Ufq5"})[1]
-        .find("div", attrs={"class": "CompanyTopInfo_contentWrapper__2Jkic"})
-        .find("span", attrs={"class": "CompanyTopInfo_infoValue__27_Yo"})
-    )
-    if company_employee_size is not None:
-        company_employee_size = company_employee_size.getText()  # .replace('\n', '')
-    else:
         company_employee_size = ""
-
-    company_revenue = (
-        page.find_all("div", attrs={"class": "CompanyTopInfo_infoItem__2Ufq5"})[0]
-        .find("div", attrs={"class": "CompanyTopInfo_contentWrapper__2Jkic"})
-        .find("span", attrs={"class": "CompanyTopInfo_infoValue__27_Yo"})
-    )
-    if company_revenue is not None:
-        company_revenue = company_revenue.getText()  # .replace('\n', '')
-    else:
         company_revenue = ""
 
     contact_details = []
@@ -132,9 +147,10 @@ def parse_company_profiles(valid_source_url):
         else:
             contact_jobtitle = ""
 
-        contact_email_domain = contact.find("button", attrs={"itemprop": "email"})
-        if contact_email_domain is not None:
-            contact_email_domain = contact_email_domain.getText()  # .replace('\n', '')
+        contact_email = contact.find("button", attrs={"itemprop": "email"})
+        if contact_email is not None:
+            contact_email = contact_email.getText()  # .replace('\n', '')
+            contact_email_domain = re.sub(r"^.*?@", "", contact_email)
         else:
             contact_email_domain = ""
 
@@ -156,6 +172,12 @@ def parse_company_profiles(valid_source_url):
         "company_revenue": company_revenue,
         "contact_details": contact_details,
     }
+
+    es_cp = es_client.index(
+        index="company-profiles", doc_type="docs", body=company_profiles_data
+    )
+
+    print(company_profiles_data)
 
     return company_profiles_data
 
