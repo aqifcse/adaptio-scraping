@@ -1,0 +1,22 @@
+from jsonschema import validate
+
+company_index_schema = {
+    "type": "array",
+    "contentEncoding": "utf-8"
+    "properties": [{
+        "company_name": {
+            "type": "string",
+        },
+        "source_url": {
+            "type": "string",
+        }
+    }],
+}
+
+validate(
+    instance=[{
+        "company_name" : "A&A Technology Group", 
+        "source_url" : "https://www.adapt.io/company/a-a-technology-group"
+    }], 
+    schema=company_index_schema
+)
