@@ -9,20 +9,6 @@ from urllib.parse import urljoin
 import json
 import re
 
-from elasticsearch import Elasticsearch
-
-es_client = Elasticsearch(["http://localhost:9200"])
-
-drop_company_index = es_client.indices.create(index="company-index", ignore=400)
-create_company_index = es_client.indices.delete(
-    index="company-index", ignore=[400, 404]
-)
-
-drop_company_profiles = es_client.indices.create(index="company-profiles", ignore=400)
-create_company_profiles = es_client.indices.delete(
-    index="company-profiles", ignore=[400, 404]
-)
-
 
 def get_page(url):
     session = HTMLSession()
@@ -52,12 +38,6 @@ def parse_company_index(url):
         }
 
         # parse_company_profiles(source_url)
-
-        # ingest payload into elasticsearch
-        es_ci = es_client.index(
-            index="company-index", doc_type="docs", body=company_index_data
-        )
-
         print(company_index_data)
 
         company_index_list.append(company_index_data)
@@ -172,10 +152,6 @@ def parse_company_profiles(valid_source_url):
         "company_revenue": company_revenue,
         "contact_details": contact_details,
     }
-
-    es_cp = es_client.index(
-        index="company-profiles", doc_type="docs", body=company_profiles_data
-    )
 
     print(company_profiles_data)
 
