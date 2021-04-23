@@ -144,10 +144,8 @@ company_name VARCHAR(1000), source_url VARCHAR(10000),PRIMARY KEY(id));
 Step 2 − Next, we need to deal with Unicode. Note that MySQL does not handle Unicode by default. We need to turn on this feature with the help of following commands which will change the default character set for the database, for the table and for both of the columns −
 ```
 ALTER DATABASE adaptio_scrap CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-ALTER TABLE company_index CONVERT TO CHARACTER SET utf8mb4 COLLATE
-utf8mb4_unicode_ci;
-ALTER TABLE company_index CHANGE company_name company_name VARCHAR(1000) CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+ALTER TABLE company_index CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE company_index CHANGE company_name company_name VARCHAR(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 **Testing**
