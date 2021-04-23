@@ -190,10 +190,10 @@ Out[6]:
 
 **2. Which database engine I have chosen and why?**
 I am using MySQL because 
-- MySQL is a robust and secure 
+- MySQL is a robust and secure database
 - Here both of the JSON data can be stored as table row
-- Can be established relation between the fields value.
-- MySQL supports JSON
+- Can be established relation between the fields value and can be implemented different queries
+- MySQL supports native JSON datatype
 
 
 
