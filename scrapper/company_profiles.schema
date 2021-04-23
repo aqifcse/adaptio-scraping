@@ -1,0 +1,94 @@
+from jsonschema import validate
+
+company_profiles_schema = {
+    "type": "array",
+    "contentEncoding": "utf-8"
+    "properties": [{
+        "company_name": {
+            "type": "string",
+        },
+        "company_location": {
+            "type": "string",
+        },
+        "company_website": {
+            "type": "string",
+        },
+        "company_webdomain": {
+            "type": "string",
+        },
+        "company_industry": {
+            "type": "string",
+        },
+        "company_employee_size": {
+            "type": "string",
+        },
+        "company_revenue": {
+            "type": "string",
+        },
+        "company_details": [
+            "type": "array",
+            "properties":[{
+                "contact_name": {
+                    "type": "string",
+                },
+                "contact_jobtitle": {
+                    "type": "string",
+                },
+                "contact_email_domain": {
+                    "type": "string",
+                },
+            }]
+        ]
+    }],
+}
+
+validate(
+    instance=[{
+        "company_name": "A&A Technology Group", 
+        "company_location": "Waco, Texas, United States", 
+        "company_website": "http://www.aatg.net", 
+        "company_webdomain": "aatg.net", 
+        "company_industry": "Telecommunications", 
+        "company_employee_size": "25 - 100", 
+        "company_revenue": "$1 - 10M", 
+        "contact_details": [{
+            "contact_name": "Phillip Neely", 
+            "contact_jobtitle": "President", 
+            "contact_email_domain": "aatg.net"
+        }, {
+            "contact_name": "Darrin Guffy", 
+            "contact_jobtitle": "Service", 
+            "contact_email_domain": "aatg.net"
+        }, {
+            "contact_name": "Jp Miller", 
+            "contact_jobtitle": 
+            "Accounting / Operations", 
+            "contact_email_domain": "aatg.net"
+        }, {
+            "contact_name": "Alan Hummon", 
+            "contact_jobtitle": "Vice President", 
+            "contact_email_domain": "aatg.net"
+        }, {
+            "contact_name": "Charles Pickering", 
+            "contact_jobtitle": "Service Manager", 
+            "contact_email_domain": "aatg.net"
+        }, {
+            "contact_name": "Bob Krick", 
+            "contact_jobtitle": "Manager, Existing Customer Base", 
+            "contact_email_domain": "aatg.net"
+        }, {
+            "contact_name": "Phil Anderson", 
+            "contact_jobtitle": "Serveilance Systems and Telecommunications", 
+            "contact_email_domain": "aatg.net"
+        }, {
+            "contact_name": "William Dixson", 
+            "contact_jobtitle": "Service Coordinator/Support Tech I", 
+            "contact_email_domain": "aatg.net"
+        }, {
+            "contact_name": "Matt Hummon", 
+            "contact_jobtitle": "Systems Engineer", 
+            "contact_email_domain": "aatg.net"
+        }
+    ]},} 
+    schema=company_profiles_schema
+)
