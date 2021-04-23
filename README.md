@@ -75,8 +75,12 @@ Required packages are -
 lxml==4.6.3
 requests==2.25.1
 requests_html==0.10.0
+PyMySQL==1.0.2
 jsonschema==3.2.0
 jsonschema[format]
+ipython==7.16.1
+pandas==1.1.5
+boto3
 ```
 Noted that, installing requests-html will automatically install Beautifulsoup(bs4). If not, install it by pip
 ```bash
@@ -93,7 +97,58 @@ Noted that, installing requests-html will automatically install Beautifulsoup(bs
 (venv) x@x:~/adaptio/scrapper$ python adaptio.py
 ```
 
-**Storing Data in MySQL**
+** Data Processingin AWS S3 and Storing Data in MySQL**
+
+**Data Processing**
+
+Step 1 − First we need an AWS account which will provide us the secret keys for using in our Python script while storing the data. It will create a S3 bucket in which we can store our data.
+
+Step 2 − Next, we need to install boto3 Python library for accessing S3 bucket. It can be installed with the help of the following command −
+```bash
+pip install boto3
+```
+
+Step 3 − Next, we can use the following Python script for scraping data from web page and saving it to AWS S3 bucket.
+
+First, we need to import Python libraries for scraping, here we are working with requests, and boto3 saving data to S3 bucket.
+
+```
+import boto3
+```
+
+Now for storing data to S3 bucket, we need to create S3 client as follows −
+
+```
+s3 = boto3.client('s3')
+bucket_name = "adaptio-content"
+```
+Next line of code will create S3 bucket as follows −
+
+```
+s3.create_bucket(Bucket = bucket_name, ACL = 'public-read')
+s3.put_object(Bucket = bucket_name, Key = '', Body = data, ACL = "public-read")
+```
+
+Now you can check the bucket with name adaptio-content from your AWS account.
+
+
+**Data Storing**
+
+Step 1 − First, by using MySQL we need to create a database and table in which we want to save our scraped data. For example, we are creating the table with following query −
+
+**company_index table**
+```
+CREATE TABLE company_index (id BIGINT(7) NOT NULL AUTO_INCREMENT,
+company_name VARCHAR(1000), source_url VARCHAR(10000),PRIMARY KEY(id));
+```
+Step 2 − Next, we need to deal with Unicode. Note that MySQL does not handle Unicode by default. We need to turn on this feature with the help of following commands which will change the default character set for the database, for the table and for both of the columns −
+```
+ALTER DATABASE adaptio_scrap CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+ALTER TABLE company_index CONVERT TO CHARACTER SET utf8mb4 COLLATE
+utf8mb4_unicode_ci;
+ALTER TABLE company_index CHANGE company_name company_name VARCHAR(1000) CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
 
 **Testing**
 - Test the scrapper/adaptio.py script by running scrapper/test.py script
@@ -194,6 +249,7 @@ I am using MySQL because
 - Here both of the JSON data can be stored as table row
 - Can be established relation between the fields value and can be implemented different queries
 - MySQL supports native JSON datatype
+- Commented boto3 code for Data Processing using AWS S3 for massive scale data storing
 
 
 
