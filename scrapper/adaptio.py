@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import string
-
 from lxml import html
 from requests_html import HTMLSession
-from collections import OrderedDict
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import json
@@ -29,8 +27,18 @@ def parse_company_index(url):
     )
 
     for company in all_companies:
-        company_name = company.find("a").getText()
+
+        company_name = company.find("a")
+        if company_name is not None:
+            company_name = company_name.getText()  # .replace('\n', '')
+        else:
+            company_name = None
+
         source_url = company.find("a").get("href")
+        if source_url is not None:
+            source_url = source_url  # .replace('\n', '')
+        else:
+            source_url = None
 
         company_index_data = {
             "company_name": company_name,
@@ -53,7 +61,7 @@ def parse_company_profiles(valid_source_url):
     if company_name is not None:
         company_name = company_name.getText()  # .replace('\n', '')
     else:
-        company_name = ""
+        company_name = None
 
     company_website = page.find(
         "div", attrs={"class": "CompanyTopInfo_websiteUrl__13kpn"}
@@ -61,7 +69,7 @@ def parse_company_profiles(valid_source_url):
     if company_website is not None:
         company_website = company_website.getText()  # .replace('\n', '')
     else:
-        company_website = ""
+        company_website = None
 
     company_webdomain = page.find(
         "div", attrs={"class": "CompanyTopInfo_websiteUrl__13kpn"}
@@ -71,7 +79,7 @@ def parse_company_profiles(valid_source_url):
             "http://www.", ""
         )  # .replace('\n', '')
     else:
-        company_webdomain = ""
+        company_webdomain = None
 
     company_details = page.find_all(
         "div", attrs={"class": "CompanyTopInfo_infoItem__2Ufq5"}
@@ -89,7 +97,7 @@ def parse_company_profiles(valid_source_url):
         if not len(details_value_list) == 4 and len(details_value_list) < 4:
             last = 4 - len(details_value_list)
             for i in range(0, last):
-                details_value_list.insert(0, "")
+                details_value_list.insert(0, None)
 
         company_location = details_value_list[3]
         company_industry = details_value_list[2]
@@ -97,10 +105,10 @@ def parse_company_profiles(valid_source_url):
         company_revenue = details_value_list[0]
 
     else:
-        company_location = ""
-        company_industry = ""
-        company_employee_size = ""
-        company_revenue = ""
+        company_location = None
+        company_industry = None
+        company_employee_size = None
+        company_revenue = None
 
     contact_details = []
 
@@ -119,20 +127,22 @@ def parse_company_profiles(valid_source_url):
         if contact_name is not None:
             contact_name = contact_name.getText()  # .replace('\n', '')
         else:
-            contact_name = ""
+            contact_name = None
 
         contact_jobtitle = contact.find("p", attrs={"itemprop": "jobTitle"})
         if contact_jobtitle is not None:
             contact_jobtitle = contact_jobtitle.getText()  # .replace('\n', '')
         else:
-            contact_jobtitle = ""
+            contact_jobtitle = None
 
         contact_email = contact.find("button", attrs={"itemprop": "email"})
         if contact_email is not None:
             contact_email = contact_email.getText()  # .replace('\n', '')
-            contact_email_domain = re.sub(r"^.*?@", "", contact_email)
+            contact_email_domain = re.sub(
+                r"^.*?@", "", contact_email
+            )  # removing all the characters before '@' to get the domain only
         else:
-            contact_email_domain = ""
+            contact_email_domain = None
 
         contact_detail = {
             "contact_name": contact_name,
