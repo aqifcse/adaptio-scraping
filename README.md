@@ -1,9 +1,9 @@
 **Adapt I/O Scraping**
 
-- This project will scrap company_index and company_profiles data from ![adaptio](https://www.adapt.io/directory/industry/telecommunications/A-1) - - - By running scrapper/adaptio.py both company_index.json and company_profiles.json will be written with the scrapped data 
+- This project will scrap company_index and company_profiles data from [adaptio](https://www.adapt.io/directory/industry/telecommunications/A-1) - - - By running scrapper/adaptio.py both company_index.json and company_profiles.json will be written with the scrapped data 
 - The scrapped data is stored DB (In this project, I have used MySQL) 
 - The scrapper/adaptio.py scrpit can be tested by running test.py 
-- For data points validation, I have used ![jsonschema](https://python-jsonschema.readthedocs.io/en/stable/)
+- For data points validation, I have used [jsonschema](https://python-jsonschema.readthedocs.io/en/stable/)
 
 **JSON Format**
 
@@ -178,15 +178,22 @@ Out[6]:
 
 
 **Question and Answer**
-**1. The architecture of your application**
-* The data extracted from adapt io site through requests-html by session.get(url)
-* From url created a soup/page
-* from page, extracted the texts, urls by tag
-* Store two output JSON Files in to tables
-* Build TestCases by unittesting
-* Validation of the data points
-**2. Which database engine you choose and why?**
-I am using MySQL because MySQL is a robust, secure. Here data is rowID based and can be established relation between the fields value. Recently MySQL supports JSON
+**1. The architecture of my application**
+
+- The data extracted from adapt io site through requests-html by session.get(url)
+- From url created a soup/page
+- from page, extracted the texts, urls by tag
+- Store two output JSON Files in to tables
+- Build TestCases by unittesting
+- Validation of the data points
+
+
+**2. Which database engine I have chosen and why?**
+I am using MySQL because 
+- MySQL is a robust and secure 
+- Here both of the JSON data can be stored as table row
+- Can be established relation between the fields value.
+- MySQL supports JSON
 
 
 
