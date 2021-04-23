@@ -1,19 +1,43 @@
 # -*- coding: utf-8 -*-
 # import boto3 # for Data Processing using AWS S3 for massive scale data storing
+import datetime
 import string
 from lxml import html
 from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+import random
+import pymysql
 import json
 import re
 
-# def massive_scale_setup():
-#     s3 = boto3.client('s3')
-#     bucket_name = "adaptio-content"
+# configuration of AWS S3 for massive scale data processing
 
-#     s3.create_bucket(Bucket = bucket_name, ACL = 'public-read')
-#     s3.put_object(Bucket = bucket_name, Key = '', Body = data, ACL = "public-read")
+# s3 = boto3.client('s3')
+# bucket_name = "adaptio-content"
+
+# s3.create_bucket(Bucket = bucket_name, ACL = 'public-read')
+# s3.put_object(Bucket = bucket_name, Key = '', Body = data, ACL = "public-read")
+
+# MySQL Setup
+conn = pymysql.connect(
+    host="localhost", user="scrap_user", passwd="p", db="adaptio_scrap", charset="utf8"
+)
+cur = conn.cursor()
+cur.execute("USE adaptio_scrap")
+random.seed(datetime.datetime.now())
+
+
+def company_index_store(company_name, source_url):
+    cur.execute(
+        "INSERT INTO company_index(company_name, source_url) VALUES " '("%s","%s")',
+        (company_name, source_url),
+    )
+    cur.connection.commit()
+
+    # finally
+    # cur.close()
+    # conn.close()
 
 
 def get_page(url):
@@ -52,9 +76,11 @@ def parse_company_index(url):
             "company_name": company_name,
             "source_url": source_url,
         }
-
         # parse_company_profiles(source_url)
         print(company_index_data)
+
+        # Inserting the values into db
+        company_index_store(company_name, source_url)
 
         company_index_list.append(company_index_data)
 
