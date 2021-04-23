@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# import boto3 # for Data Processing using AWS S3 for massive scale data storing
 import string
 from lxml import html
 from requests_html import HTMLSession
@@ -6,6 +7,13 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import json
 import re
+
+# def massive_scale_setup():
+#     s3 = boto3.client('s3')
+#     bucket_name = "adaptio-content"
+
+#     s3.create_bucket(Bucket = bucket_name, ACL = 'public-read')
+#     s3.put_object(Bucket = bucket_name, Key = '', Body = data, ACL = "public-read")
 
 
 def get_page(url):
